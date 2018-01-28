@@ -1,1 +1,1 @@
-# CE330-fingerprint-scanner
+# SE330-fingerprint-scanner
