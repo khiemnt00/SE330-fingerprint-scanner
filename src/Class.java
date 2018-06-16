@@ -14,15 +14,17 @@ import java.util.ArrayList;
 public class Class {
     private String name;
     private String classid;
-    private int hocky;
+    private String hocky;
     private String namhoc;
     student student;
+    private String giangvien;
     public Class(){super();}
-    public Class(String name, String classid, int hocky, String namhoc){
+    public Class(String name, String classid, String hocky, String namhoc, String giangvien){
         this.name = name;
         this.classid = classid;
         this.hocky = hocky;
         this.namhoc = namhoc;
+        this.giangvien = giangvien;
     }
     public Class(String classid, student student){
         super();
@@ -48,10 +50,10 @@ public class Class {
     public void setclassid(String classid){
         this.classid = classid;
     }
-    public int gethocky(){
+    public String gethocky(){
         return this.hocky;
     }
-    public void sethocky(int hocky){
+    public void sethocky(String hocky){
         this.hocky = hocky;
     }
     public String getnamhoc(){
@@ -60,12 +62,18 @@ public class Class {
     public void setnamhoc(String namhoc){
         this.namhoc = namhoc;
     }
+    public String getgiangvien(){
+        return this.giangvien;
+    }
+    public void setgiangvien(String giangvien){
+        this.giangvien = giangvien;
+    }
     ArrayList<student> sinhvien = new ArrayList<student>();
     public void addstudent(student student){
         this.sinhvien.add(student);
     }
     public Object[] toArray()
     {
-        return new Object[]{this.name, this.classid, this.hocky, this.namhoc};
+        return new Object[]{this.name, this.classid, this.hocky, this.namhoc, this.giangvien};
     }
 }
