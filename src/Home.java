@@ -282,6 +282,11 @@ public class Home extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        frame_scanfinger = new javax.swing.JFrame();
+        kGradientPanel2 = new keeptoo.KGradientPanel();
+        lb_statusicon = new javax.swing.JLabel();
+        lb_statustxt = new javax.swing.JLabel();
+        lb_canclescan = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         kGradientPanel1 = new keeptoo.KGradientPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -378,6 +383,65 @@ public class Home extends javax.swing.JFrame {
         lb_namefinal = new javax.swing.JLabel();
         lb_studentidfinal = new javax.swing.JLabel();
         lb_classidfinal = new javax.swing.JLabel();
+
+        kGradientPanel2.setkEndColor(new java.awt.Color(0, 78, 146));
+        kGradientPanel2.setkStartColor(new java.awt.Color(0, 4, 40));
+
+        lb_statusicon.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lb_statusicon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/press-your-finger-fingerprint-icon-256.png"))); // NOI18N
+
+        lb_statustxt.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lb_statustxt.setForeground(new java.awt.Color(255, 255, 255));
+        lb_statustxt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lb_statustxt.setText("Press your finger");
+
+        lb_canclescan.setText("Cancle");
+        lb_canclescan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lb_canclescanActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout kGradientPanel2Layout = new javax.swing.GroupLayout(kGradientPanel2);
+        kGradientPanel2.setLayout(kGradientPanel2Layout);
+        kGradientPanel2Layout.setHorizontalGroup(
+            kGradientPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(kGradientPanel2Layout.createSequentialGroup()
+                .addGroup(kGradientPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(kGradientPanel2Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(lb_canclescan))
+                    .addGroup(kGradientPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(lb_statustxt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(kGradientPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lb_statusicon, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        kGradientPanel2Layout.setVerticalGroup(
+            kGradientPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(kGradientPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lb_statusicon)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lb_statustxt)
+                .addGap(18, 18, 18)
+                .addComponent(lb_canclescan)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout frame_scanfingerLayout = new javax.swing.GroupLayout(frame_scanfinger.getContentPane());
+        frame_scanfinger.getContentPane().setLayout(frame_scanfingerLayout);
+        frame_scanfingerLayout.setHorizontalGroup(
+            frame_scanfingerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(kGradientPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        frame_scanfingerLayout.setVerticalGroup(
+            frame_scanfingerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(kGradientPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -1363,6 +1427,9 @@ public class Home extends javax.swing.JFrame {
 
     private void btn_scanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_scanActionPerformed
         // TODO add your handling code here:
+        frame_scanfinger.pack();
+        frame_scanfinger.setLocationRelativeTo(null);
+        frame_scanfinger.setVisible(true);
     }//GEN-LAST:event_btn_scanActionPerformed
 
     private void btn_deletestudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deletestudentActionPerformed
@@ -1704,6 +1771,11 @@ public class Home extends javax.swing.JFrame {
         if(student_combobox_class.getSelectedIndex()>=0)
             RenderStudentByClassID(rootClasses.get(student_combobox_class.getSelectedIndex()).getId());
     }//GEN-LAST:event_student_combobox_classActionPerformed
+
+    private void lb_canclescanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lb_canclescanActionPerformed
+        // TODO add your handling code here:
+        frame_scanfinger.setVisible(false);
+    }//GEN-LAST:event_lb_canclescanActionPerformed
     
     /**
      * @param args the command line arguments
@@ -1768,6 +1840,7 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> combobox_semester;
     private javax.swing.JComboBox<String> combobox_year;
     private javax.swing.JComboBox<String> dashboard_combox_chooseclass;
+    private javax.swing.JFrame frame_scanfinger;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton8;
     private javax.swing.JComboBox<String> jComboBox5;
@@ -1821,12 +1894,16 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField8;
     private javax.swing.JTextField jTextField9;
     private keeptoo.KGradientPanel kGradientPanel1;
+    private keeptoo.KGradientPanel kGradientPanel2;
+    private javax.swing.JButton lb_canclescan;
     private javax.swing.JLabel lb_classidfinal;
     private javax.swing.JLabel lb_date;
     private javax.swing.JLabel lb_name;
     private javax.swing.JLabel lb_namefinal;
     private javax.swing.JLabel lb_start;
     private javax.swing.JLabel lb_status;
+    private javax.swing.JLabel lb_statusicon;
+    private javax.swing.JLabel lb_statustxt;
     private javax.swing.JLabel lb_studentidfinal;
     private javax.swing.JLabel lb_time;
     private javax.swing.JPanel pnl_class;
