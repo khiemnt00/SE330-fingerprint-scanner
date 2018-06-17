@@ -207,7 +207,7 @@ public class Home extends javax.swing.JFrame {
             r=gson.fromJson(rsp, GetCurrentRollRespone.class);
             statistic_time_joined.setText("");
             for (int i=0;i<r.getData().getRolls().size();i++){
-                statistic_time_joined.append(r.getData().getRolls().get(i).getTime()+"\n");
+                statistic_time_joined.append(r.getData().getRolls().get(i).getTime().substring(0,10)+"-"+r.getData().getRolls().get(i).getTime().substring(12,19)+"\n");
             }
 
         }
