@@ -623,7 +623,7 @@ public class Home extends javax.swing.JFrame {
 
         lb_status.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         lb_status.setForeground(new java.awt.Color(51, 255, 51));
-        lb_status.setText("Success");
+        lb_status.setText("Ready");
 
         rollTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -697,14 +697,12 @@ public class Home extends javax.swing.JFrame {
                             .addGroup(pnl_dashboardLayout.createSequentialGroup()
                                 .addGap(28, 28, 28)
                                 .addGroup(pnl_dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(pnl_dashboardLayout.createSequentialGroup()
-                                        .addComponent(jLabel4)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(lb_status))
-                                    .addGroup(pnl_dashboardLayout.createSequentialGroup()
-                                        .addComponent(jLabel11)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(dashboard_combox_chooseclass, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(jLabel11)
+                                    .addComponent(jLabel4))
+                                .addGap(18, 18, 18)
+                                .addGroup(pnl_dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(dashboard_combox_chooseclass, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lb_status, javax.swing.GroupLayout.DEFAULT_SIZE, 356, Short.MAX_VALUE))
                                 .addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())))
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1746,9 +1744,10 @@ public class Home extends javax.swing.JFrame {
          
                     int dialogButton = JOptionPane.OK_CANCEL_OPTION;
                     JOptionPane.showConfirmDialog(null,"File: "+ file.getName() + " existed. Do you want to Overwrite it ?", "Warning", dialogButton);
-                    if(dialogButton == JOptionPane.OK_OPTION){
+                    if(dialogButton == JOptionPane.OK_OPTION)
+                    {
         
-                        XSSFWorkbook workbook = new XSSFWorkbook();
+                    XSSFWorkbook workbook = new XSSFWorkbook();
                 XSSFSheet sheet = workbook.createSheet(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getCode());
                 int rowNum = 0;
                 //Lấy tên lớp và mã lớp
@@ -1781,7 +1780,8 @@ public class Home extends javax.swing.JFrame {
                     for(int k=0;k<reportData.getData().getRolls().get(j).getRolls().size();k++)
                     {
                         currentCell = row.createCell(k+3);
-                        if(reportData.getData().getRolls().get(j).getRolls().get(j).getChecked()==true)
+                        System.out.println(reportData.getData().getRolls().get(j).getRolls().get(k).getChecked());
+                        if(reportData.getData().getRolls().get(j).getRolls().get(k).getChecked()==true)
                             currentCell.setCellValue("x");                        
                         else currentCell.setCellValue("");
                     }                                       
@@ -1796,6 +1796,7 @@ public class Home extends javax.swing.JFrame {
                     } catch (IOException ex) {
                         Logger.getLogger(Home.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                JOptionPane.showMessageDialog(null,"Export to Excel successfully");
                     }
                 }
             else{
@@ -1833,7 +1834,8 @@ public class Home extends javax.swing.JFrame {
                     for(int k=0;k<reportData.getData().getRolls().get(j).getRolls().size();k++)
                     {
                         currentCell = row.createCell(k+3);
-                        if(reportData.getData().getRolls().get(j).getRolls().get(j).getChecked()==true)
+                        System.out.println(reportData.getData().getRolls().get(j).getRolls().get(k).getChecked());
+                        if(reportData.getData().getRolls().get(j).getRolls().get(k).getChecked()==true)
                             currentCell.setCellValue("x");                        
                         else currentCell.setCellValue("");
                     }                                       
@@ -1848,9 +1850,9 @@ public class Home extends javax.swing.JFrame {
                     } catch (IOException ex) {
                         Logger.getLogger(Home.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                
+                JOptionPane.showMessageDialog(null,"Export to Excel successfully");
             }
-            JOptionPane.showMessageDialog(null,"Export to Excel successfully");
+            
         }
         
     }//GEN-LAST:event_jButton1ActionPerformed
