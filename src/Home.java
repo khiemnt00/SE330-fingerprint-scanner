@@ -1,14 +1,29 @@
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import hardware.FingerData;
+import hardware.FingerHW;
+import httpserivce.HttpService;
+import httpserivce.responemodel.AttendenceClass;
+import httpserivce.responemodel.CreateClassRespone;
+import httpserivce.responemodel.GetAllStudentResponse;
+import httpserivce.responemodel.GetClassAllResponse;
+import httpserivce.responemodel.GetCurrentRollRespone;
+import httpserivce.responemodel.GetRollReportResponse;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,6 +34,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
+import org.apache.http.client.utils.DateUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -46,6 +62,7 @@ public class Home extends javax.swing.JFrame {
     /**
      * Creates new form Home
      */
+    public List<AttendenceClass> rootClasses=new ArrayList<AttendenceClass>();
     public Home() {
         initComponents();
         showdate();
@@ -57,16 +74,139 @@ public class Home extends javax.swing.JFrame {
               SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                 Date d = new Date();
-                SimpleDateFormat s = new SimpleDateFormat("dd-MM-yyyy   hh:mm:ss");
-                 DefaultTableModel model = (DefaultTableModel) rollTable.getModel();
-                model.addRow(new Object[]{"Column 1", "Column 2", s.format(d)});
+//                SimpleDateFormat s = new SimpleDateFormat("dd-MM-yyyy   hh:mm:ss");
+//                 DefaultTableModel model = (DefaultTableModel) rollTable.getModel();
+//                model.addRow(new Object[]{"Column 1", "Column 2", s.format(d)});
 
                 }
               });
 
           }
         }).start();
- 
+        
+        new Thread(new Runnable() {
+            public void run() {
+      //        connectHardware();
+            }
+        }).start();
+        GetAllClass();
+        GetAllStudentByClassID(9);
+        GetCurrentRollByClassID(9);
+       
+    }
+    
+    void GetAllClass(){
+            HttpService httpsv=new HttpService();
+        try {
+            String rsp=new String(httpsv.GetClassAll());
+            Gson gson = new GsonBuilder().create();
+            GetClassAllResponse r=new GetClassAllResponse();
+            r=gson.fromJson(rsp, GetClassAllResponse.class);
+            System.out.println(r.toString());
+            DefaultTableModel model = (DefaultTableModel) tb_class.getModel();
+            rootClasses.clear();
+            for (int i=0;i<r.getData().getClasses().size();i++){
+                rootClasses.add(r.getData().getClasses().get(i));
+                model.addRow(new Object[]{r.getData().getClasses().get(i).getName(), r.getData().getClasses().get(i).getCode(), r.getData().getClasses().get(i).getSemester(),r.getData().getClasses().get(i).getYear()});
+                combox_chooseclass.addItem(r.getData().getClasses().get(i).getCode()+ " HK" + r.getData().getClasses().get(i).getSemester()+ " " + r.getData().getClasses().get(i).getYear());
+                combobox_classidstudent.addItem(r.getData().getClasses().get(i).getCode()+ " HK" + r.getData().getClasses().get(i).getSemester()+ " " + r.getData().getClasses().get(i).getYear());
+                statistic_class_combobox.addItem(r.getData().getClasses().get(i).getCode()+ " HK" + r.getData().getClasses().get(i).getSemester()+ " " + r.getData().getClasses().get(i).getYear());
+
+            }
+
+        }catch(Exception e){
+            System.err.println(e);
+        }
+    }
+    
+    void GetCurrentRollByClassID(int class_id){
+                    HttpService httpsv=new HttpService();
+            try {
+            String rsp=httpsv.GetCurentRolls();
+            Gson gson = new GsonBuilder().create();
+            GetCurrentRollRespone r=new GetCurrentRollRespone();
+            r=gson.fromJson(rsp, GetCurrentRollRespone.class);
+            SimpleDateFormat s = new SimpleDateFormat("dd-MM-yyyy   hh:mm:ss");
+            DefaultTableModel model = (DefaultTableModel) rollTable.getModel();
+            for (int i=0;i<r.getData().getRolls().size();i++){
+                model.addRow(new Object[]{r.getData().getRolls().get(i).getName(), r.getData().getRolls().get(i).getMssv(), r.getData().getRolls().get(i).getTime()});
+            }
+        }
+        catch(Exception e){
+            System.err.println(e);
+        }
+    }
+    
+        void GetAllStudentByClassID(int class_id){
+             HttpService httpsv=new HttpService();
+            try {
+            String rsp=httpsv.GetAllStudent(9);
+            Gson gson = new GsonBuilder().create();
+            GetAllStudentResponse r=new GetAllStudentResponse();
+            r=gson.fromJson(rsp, GetAllStudentResponse.class);
+            DefaultTableModel model = (DefaultTableModel) tb_student.getModel();
+            for (int i=0;i<r.getData().getStudents().size();i++){
+                model.addRow(new Object[]{r.getData().getStudents().get(i).getName(), r.getData().getStudents().get(i).getMssv(), r.getData().getStudents().get(i).getAutheticated()});
+            }
+
+        }
+        catch(Exception e){
+            System.err.println(e);
+        }
+        }
+        int CreateClass(AttendenceClass attendenceClass){
+             HttpService httpsv=new HttpService();
+            try {
+            String rsp=httpsv.CreateClass(attendenceClass);
+            Gson gson = new GsonBuilder().create();
+            CreateClassRespone r=new CreateClassRespone();
+            r=gson.fromJson(rsp, CreateClassRespone.class);
+            return r.getRcode();
+
+        }
+        catch(Exception e){
+            System.err.println(e);
+        }
+            return 0;
+      }
+    
+        void StatisticGetRollTimeStudent(int class_id,String mssv){
+            System.out.println(String.valueOf(class_id));
+            System.out.println(String.valueOf(mssv));
+            HttpService httpsv=new HttpService();
+            try {
+            String rsp=httpsv.GetRolltimesStudent(class_id,mssv);
+            Gson gson = new GsonBuilder().create();
+            GetCurrentRollRespone r=new GetCurrentRollRespone();
+            r=gson.fromJson(rsp, GetCurrentRollRespone.class);
+            statistic_time_joined.setText("");
+            for (int i=0;i<r.getData().getRolls().size();i++){
+                statistic_time_joined.append(r.getData().getRolls().get(i).getTime()+"\n");
+            }
+
+        }
+        catch(Exception e){
+            System.err.println(e);
+        }
+        }
+        
+    GetRollReportResponse StatisticGetRollReport(int class_id){
+        System.out.println(String.valueOf(class_id));
+        HttpService httpsv=new HttpService();
+        try {
+            String rsp=httpsv.GetRollReport(class_id);
+            Gson gson = new GsonBuilder().create();
+            GetRollReportResponse r=new GetRollReportResponse();
+            r=gson.fromJson(rsp, GetRollReportResponse.class);
+
+            return r;
+
+        }
+        catch(Exception e){
+            System.err.println(e);
+        }
+        
+        return null;
     }
     void showdate(){
         Date d = new Date();
@@ -84,7 +224,34 @@ public class Home extends javax.swing.JFrame {
         
         }).start();
     }
+    void connectHardware(){
+        FingerHW fingerHW=new FingerHW();
+        fingerHW.connect();
 
+        try {
+            fingerHW.serial.getSerialPort().setComPortTimeouts(fingerHW.serial.getSerialPort().TIMEOUT_READ_BLOCKING, 50, 0);
+            InputStreamReader is = new InputStreamReader(fingerHW.serial.getSerialPort().getInputStream());
+            BufferedReader reader = new BufferedReader(is);
+            int i=0;
+            while (true) {
+                String nextLine;
+                try {
+                    nextLine = reader.readLine();
+                    System.out.println(nextLine);
+                    System.out.println(i++);
+                    Gson gson = new GsonBuilder().create(); 
+                    FingerData fingerData = gson.fromJson(nextLine, FingerData.class);
+                    System.out.println("parse:"+fingerData.toString());
+                } catch (Exception e) {}
+            }
+        } 
+        catch (Exception e) { e.printStackTrace(); }
+//                Date d = new Date();
+//                SimpleDateFormat s = new SimpleDateFormat("dd-MM-yyyy   hh:mm:ss");
+//                 DefaultTableModel model = (DefaultTableModel) rollTable.getModel();
+//                model.addRow(new Object[]{"Column 1", "Column 2", s.format(d)});
+
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -128,7 +295,7 @@ public class Home extends javax.swing.JFrame {
         txt_nameclass = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
-        txt_classid = new javax.swing.JTextField();
+        txt_classcode = new javax.swing.JTextField();
         combobox_semester = new javax.swing.JComboBox<>();
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
@@ -144,7 +311,7 @@ public class Home extends javax.swing.JFrame {
         txt_namestudent = new javax.swing.JTextField();
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
-        txt_studentid = new javax.swing.JTextField();
+        txt_mssv = new javax.swing.JTextField();
         jLabel20 = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JSeparator();
         btn_scan = new javax.swing.JButton();
@@ -168,7 +335,7 @@ public class Home extends javax.swing.JFrame {
         jButton8 = new javax.swing.JButton();
         pnl_statistic = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        statistic_class_combobox = new javax.swing.JComboBox<>();
         jComboBox5 = new javax.swing.JComboBox<>();
         jLabel8 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
@@ -186,7 +353,7 @@ public class Home extends javax.swing.JFrame {
         jLabel30 = new javax.swing.JLabel();
         jLabel31 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        statistic_time_joined = new javax.swing.JTextArea();
         lb_namefinal = new javax.swing.JLabel();
         lb_studentidfinal = new javax.swing.JLabel();
         lb_classidfinal = new javax.swing.JLabel();
@@ -500,11 +667,11 @@ public class Home extends javax.swing.JFrame {
         jLabel12.setText("Name:");
 
         jLabel13.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
-        jLabel13.setText("ClassID:");
+        jLabel13.setText("Code:");
 
-        txt_classid.addActionListener(new java.awt.event.ActionListener() {
+        txt_classcode.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_classidActionPerformed(evt);
+                txt_classcodeActionPerformed(evt);
             }
         });
 
@@ -587,7 +754,7 @@ public class Home extends javax.swing.JFrame {
                                     .addGroup(pnl_classLayout.createSequentialGroup()
                                         .addComponent(jLabel13)
                                         .addGap(18, 18, 18)
-                                        .addComponent(txt_classid, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(txt_classcode, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addGap(45, 45, 45)
                                 .addGroup(pnl_classLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel15)
@@ -623,7 +790,7 @@ public class Home extends javax.swing.JFrame {
                     .addComponent(combobox_semester, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(21, 21, 21)
                 .addGroup(pnl_classLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_classid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_classcode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel13)
                     .addComponent(jLabel15)
                     .addComponent(combobox_year, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -664,7 +831,7 @@ public class Home extends javax.swing.JFrame {
         jLabel18.setText("Name:");
 
         jLabel19.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
-        jLabel19.setText("Student ID:");
+        jLabel19.setText("Mssv:");
 
         jLabel20.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         jLabel20.setText("ClassID");
@@ -691,7 +858,7 @@ public class Home extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Name", "StudentID", "Verified"
+                "Name", "Mssv", "Verified"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -753,7 +920,7 @@ public class Home extends javax.swing.JFrame {
                             .addComponent(jLabel20))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(pnl_studentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txt_studentid, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txt_mssv, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(combobox_classidstudent, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(pnl_studentLayout.createSequentialGroup()
                         .addGroup(pnl_studentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -806,7 +973,7 @@ public class Home extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(pnl_studentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel19)
-                            .addComponent(txt_studentid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txt_mssv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(pnl_studentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel20)
@@ -911,14 +1078,14 @@ public class Home extends javax.swing.JFrame {
 
         jLabel7.setText("ClassID");
 
-        jComboBox1.addItemListener(new java.awt.event.ItemListener() {
+        statistic_class_combobox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jComboBox1ItemStateChanged(evt);
+                statistic_class_comboboxItemStateChanged(evt);
             }
         });
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        statistic_class_combobox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                statistic_class_comboboxActionPerformed(evt);
             }
         });
 
@@ -942,7 +1109,7 @@ public class Home extends javax.swing.JFrame {
                 {null, null, null}
             },
             new String [] {
-                "Name", "StudentID", "Attendance"
+                "Name", "Mssv", "Attendance"
             }
         ));
         tb_studentlist.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -959,6 +1126,11 @@ public class Home extends javax.swing.JFrame {
         jLabel3.setText("Student Information");
 
         jButton1.setText("Export");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jLabel28.setText("Name:");
 
@@ -968,9 +1140,9 @@ public class Home extends javax.swing.JFrame {
 
         jLabel31.setText("Joined:");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane3.setViewportView(jTextArea1);
+        statistic_time_joined.setColumns(20);
+        statistic_time_joined.setRows(5);
+        jScrollPane3.setViewportView(statistic_time_joined);
 
         javax.swing.GroupLayout pnl_infostudentLayout = new javax.swing.GroupLayout(pnl_infostudent);
         pnl_infostudent.setLayout(pnl_infostudentLayout);
@@ -1012,7 +1184,7 @@ public class Home extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel30)
-                    .addComponent(lb_classidfinal))
+                    .addComponent(lb_classidfinal, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnl_infostudentLayout.createSequentialGroup()
@@ -1030,18 +1202,16 @@ public class Home extends javax.swing.JFrame {
                 .addGap(28, 28, 28)
                 .addGroup(pnl_statisticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnl_statisticLayout.createSequentialGroup()
-                        .addGroup(pnl_statisticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pnl_statisticLayout.createSequentialGroup()
-                                .addGap(206, 206, 206)
-                                .addComponent(jLabel26))
+                        .addGroup(pnl_statisticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel26)
                             .addGroup(pnl_statisticLayout.createSequentialGroup()
                                 .addComponent(jLabel7)
                                 .addGap(18, 18, 18)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel8)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jComboBox5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(statistic_class_combobox, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jComboBox5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(pnl_statisticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1073,7 +1243,7 @@ public class Home extends javax.swing.JFrame {
                     .addComponent(jLabel8)
                     .addComponent(jComboBox5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(statistic_class_combobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel10)
                     .addComponent(jComboBox6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1))
@@ -1085,7 +1255,7 @@ public class Home extends javax.swing.JFrame {
                 .addGroup(pnl_statisticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 332, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnl_infostudent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         pnl_menu.add(pnl_statistic, "card6");
@@ -1147,9 +1317,9 @@ public class Home extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_nameclassActionPerformed
 
-    private void txt_classidActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_classidActionPerformed
+    private void txt_classcodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_classcodeActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txt_classidActionPerformed
+    }//GEN-LAST:event_txt_classcodeActionPerformed
 
     private void combobox_semesterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combobox_semesterActionPerformed
         // TODO add your handling code here:
@@ -1172,7 +1342,7 @@ public class Home extends javax.swing.JFrame {
         {
             model.removeRow(tb_student.getSelectedRow());
             txt_nameclass.setText("");
-            txt_classid.setText("");
+            txt_classcode.setText("");
         }
     }//GEN-LAST:event_btn_deletestudentActionPerformed
     
@@ -1217,28 +1387,38 @@ public class Home extends javax.swing.JFrame {
     private void btn_addclassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addclassActionPerformed
         // TODO add your handling code here:
         DefaultTableModel model = (DefaultTableModel)tb_class.getModel();
-        if(txt_nameclass.getText().isEmpty()==true||txt_classid.getText().isEmpty()==true){
+        if(txt_nameclass.getText().isEmpty()==true||txt_classcode.getText().isEmpty()==true){
             JOptionPane.showMessageDialog(null,"Name or Class ID is empty. \n Please Input");
         }
         else
         {
-            String checkdupid = txt_classid.getText();
-            Class c = new Class(txt_nameclass.getText(),txt_classid.getText(),Integer.parseInt((String) combobox_semester.getSelectedItem()), (String) combobox_year.getSelectedItem());
+            String checkdupid = txt_classcode.getText();
+            AttendenceClass c = new AttendenceClass(txt_nameclass.getText(),txt_classcode.getText(), (String) combobox_year.getSelectedItem(),Integer.parseInt((String) combobox_semester.getSelectedItem()));
             int rows = tb_class.getRowCount();
             boolean check=true;
             for(int i=0; i< rows; i++){
-                if(txt_classid.getText().equals(tb_class.getValueAt(i,1))&&Integer.parseInt((String) combobox_semester.getSelectedItem())==Integer.parseInt((String) tb_class.getValueAt(i, 2))){
+                if(txt_classcode.getText().equals(tb_class.getValueAt(i,1))&&Integer.parseInt((String) combobox_semester.getSelectedItem())==Integer.parseInt((String) tb_class.getValueAt(i, 2))){
                         check=false;
                         JOptionPane.showMessageDialog(null,"Class with ID : " + checkdupid + " is existed. Please input again.","Message", JOptionPane.WARNING_MESSAGE);
                         break;
                     }
             }
             if(check==true){
-            Object row[] = {txt_nameclass.getText(),txt_classid.getText(),combobox_semester.getSelectedItem(),combobox_year.getSelectedItem()};
-            model.addRow(row);
-            combox_chooseclass.addItem(txt_classid.getText() + " HK" + combobox_semester.getSelectedItem() + " " + combobox_year.getSelectedItem());
-            combobox_classidstudent.addItem(txt_classid.getText() + " HK" + combobox_semester.getSelectedItem() + " " + combobox_year.getSelectedItem());
+            Object row[] = {txt_nameclass.getText(),txt_classcode.getText(),combobox_semester.getSelectedItem(),combobox_year.getSelectedItem()};
+            AttendenceClass attendenceClass=new AttendenceClass();
+            attendenceClass.setName(txt_nameclass.getText());
+            attendenceClass.setCode(txt_classcode.getText());
+            attendenceClass.setSemester(Integer.parseInt(combobox_semester.getSelectedItem().toString()));
+            attendenceClass.setYear(combobox_year.getSelectedItem().toString());
+            int rcode=CreateClass(attendenceClass);
+            System.out.println(rcode);
+            if (rcode==200) {
+                rootClasses.add(attendenceClass);
+                model.addRow(row);
+                combox_chooseclass.addItem(txt_classcode.getText() + " HK" + combobox_semester.getSelectedItem() + " " + combobox_year.getSelectedItem());
+                combobox_classidstudent.addItem(txt_classcode.getText() + " HK" + combobox_semester.getSelectedItem() + " " + combobox_year.getSelectedItem());
             }
+}
         }
     }//GEN-LAST:event_btn_addclassActionPerformed
 
@@ -1246,7 +1426,7 @@ public class Home extends javax.swing.JFrame {
         // TODO add your handling code here:
         DefaultTableModel model = (DefaultTableModel)tb_class.getModel();
         txt_nameclass.setText(model.getValueAt(tb_class.getSelectedRow(), 0).toString());
-        txt_classid.setText(model.getValueAt(tb_class.getSelectedRow(), 1).toString());
+        txt_classcode.setText(model.getValueAt(tb_class.getSelectedRow(), 1).toString());
         combobox_semester.setSelectedItem(model.getValueAt(tb_class.getSelectedRow(), 2).toString());
         combobox_year.setSelectedItem(model.getValueAt(tb_class.getSelectedRow(), 3).toString());
     }//GEN-LAST:event_tb_classMouseClicked
@@ -1261,7 +1441,7 @@ public class Home extends javax.swing.JFrame {
         String mamonhoc = new String();
         String tensv;
         String mssv;
-        Class newClass = new Class();
+        AttendenceClass newClass = new AttendenceClass();
         JFileChooser openfile = new JFileChooser();
         openfile.setDialogTitle("Open");
         openfile.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -1292,8 +1472,8 @@ public class Home extends javax.swing.JFrame {
                             namhoc = namhoc.substring(9);
                             System.out.println(hocky);
                             System.out.println(namhoc);
-                            newClass.sethocky(Integer.parseInt(hocky));
-                            newClass.setnamhoc(namhoc);
+                            newClass.setSemester(Integer.parseInt(hocky));
+                            newClass.setYear(namhoc);
                             
                         }
                         else if(posRow==5){
@@ -1303,8 +1483,8 @@ public class Home extends javax.swing.JFrame {
                             mamonhoc = mamonhoc.substring(5);
                             System.out.println(tenmonhoc);
                             System.out.println(mamonhoc);
-                            newClass.setname(tenmonhoc);
-                            newClass.setclassid(mamonhoc);
+                            newClass.setName(tenmonhoc);
+                            newClass.setCode(mamonhoc);
                         }
                         else if(posRow>8) // Lấy thông tin sinh viên
                         {
@@ -1313,7 +1493,7 @@ public class Home extends javax.swing.JFrame {
                             tensv = currentrow.getCell(2).getStringCellValue();
                             student currentstudent = new student(tensv,mssv);
                             model.addRow(new Object[]{tensv,mssv,"none"});
-                            newClass.sinhvien.add(currentstudent);
+//                            newClass.sinhvien.add(currentstudent);
                         }
                     }
                     
@@ -1327,46 +1507,48 @@ public class Home extends javax.swing.JFrame {
                 combox_chooseclass.addItem(mamonhoc + " HK" + hocky + " " + namhoc);
                 combobox_classidstudent.addItem(mamonhoc  + " HK" + hocky + " " + namhoc);
 
-                jComboBox1.addItem(mamonhoc);
+                statistic_class_combobox.addItem(mamonhoc);
             } catch (IOException ex) {
                 Logger.getLogger(Home.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_btn_importclassActionPerformed
 
-    private void jComboBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBox1ItemStateChanged
+    private void statistic_class_comboboxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_statistic_class_comboboxItemStateChanged
         // TODO add your handling code here:
         DefaultTableModel model = (DefaultTableModel) tb_studentlist.getModel();
-        String classid = jComboBox1.getSelectedObjects().toString().trim();
+        String classid = statistic_class_combobox.getSelectedObjects().toString().trim();
+//        System.out.println(statistic_class_combobox.getSelectedIndex());
+//        System.out.println(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getName());
         
         
-        
-    }//GEN-LAST:event_jComboBox1ItemStateChanged
+    }//GEN-LAST:event_statistic_class_comboboxItemStateChanged
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void statistic_class_comboboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statistic_class_comboboxActionPerformed
         // TODO add your handling code here:
-        
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+        System.out.println(statistic_class_combobox.getSelectedIndex());
+
+    }//GEN-LAST:event_statistic_class_comboboxActionPerformed
 
     private void btn_editclassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_editclassActionPerformed
         // TODO add your handling code here:
         DefaultTableModel model = (DefaultTableModel)tb_class.getModel();
-        String checkdupid = txt_classid.getText();
+        String checkdupid = txt_classcode.getText();
         int rows=tb_class.getRowCount();
         boolean check=true;
             for(int i=0; i< rows; i++){
-                if(txt_classid.equals(tb_class.getValueAt(i,1))&&Integer.parseInt((String) combobox_semester.getSelectedItem())==Integer.parseInt((String) tb_class.getValueAt(i, 2))){
+                if(txt_classcode.equals(tb_class.getValueAt(i,1))&&Integer.parseInt((String) combobox_semester.getSelectedItem())==Integer.parseInt((String) tb_class.getValueAt(i, 2))){
                         check=false;
                         JOptionPane.showMessageDialog(null,"Class with ID : " + checkdupid + " is existed. Please input again.","Message", JOptionPane.WARNING_MESSAGE);
                         break;
                     }
             }
         if(check == true){
-            Class c = new Class(txt_nameclass.getText(),txt_classid.getText(),Integer.parseInt((String) combobox_semester.getSelectedItem()), (String) combobox_year.getSelectedItem());
-            model.setValueAt(c.getname(),tb_class.getSelectedRow(), 0);
-            model.setValueAt(c.getclassid(),tb_class.getSelectedRow(), 1);
-            model.setValueAt(c.gethocky(),tb_class.getSelectedRow(), 2);
-            model.setValueAt(c.getnamhoc(),tb_class.getSelectedRow(), 3);
+//            Class c = new Class(txt_nameclass.getText(),txt_classid.getText(),Integer.parseInt((String) combobox_semester.getSelectedItem()), (String) combobox_year.getSelectedItem());
+//            model.setValueAt(c.getname(),tb_class.getSelectedRow(), 0);
+//            model.setValueAt(c.getclassid(),tb_class.getSelectedRow(), 1);
+//            model.setValueAt(c.gethocky(),tb_class.getSelectedRow(), 2);
+//            model.setValueAt(c.getnamhoc(),tb_class.getSelectedRow(), 3);
         }
     }//GEN-LAST:event_btn_editclassActionPerformed
 
@@ -1379,19 +1561,19 @@ public class Home extends javax.swing.JFrame {
         {
             model.removeRow(tb_class.getSelectedRow());
             txt_nameclass.setText("");
-            txt_classid.setText("");
+            txt_classcode.setText("");
         }
     }//GEN-LAST:event_btn_deleteclassActionPerformed
 
     private void btn_addstudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addstudentActionPerformed
         // TODO add your handling code here:
         DefaultTableModel model = (DefaultTableModel)tb_student.getModel();
-        if(txt_namestudent.getText().isEmpty()==true||txt_studentid.getText().isEmpty()==true){
+        if(txt_namestudent.getText().isEmpty()==true||txt_mssv.getText().isEmpty()==true){
             JOptionPane.showMessageDialog(null,"Missing field ! \nPlease input again");
         }
         else
         {           
-            String checkdupid = txt_studentid.getText();
+            String checkdupid = txt_mssv.getText();
             boolean check = true;
             int rows = model.getRowCount();
             for(int i=0; i<rows; i++){
@@ -1402,8 +1584,8 @@ public class Home extends javax.swing.JFrame {
                 }
             }
             if(check){
-                student student = new student(txt_namestudent.getText(),txt_studentid.getText());
-                model.addRow(new Object[]{txt_namestudent.getText(),txt_studentid.getText(),"none"});
+                student student = new student(txt_namestudent.getText(),txt_mssv.getText());
+                model.addRow(new Object[]{txt_namestudent.getText(),txt_mssv.getText(),"none"});
             }
         }
         
@@ -1416,7 +1598,7 @@ public class Home extends javax.swing.JFrame {
     private void btn_editstudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_editstudentActionPerformed
         // TODO add your handling code here:
         DefaultTableModel model = (DefaultTableModel)tb_student.getModel();
-        String checkdupid = txt_studentid.getText();
+        String checkdupid = txt_mssv.getText();
             boolean check = true;
             int rows = model.getRowCount();
             for(int i=0; i<rows; i++){
@@ -1427,8 +1609,8 @@ public class Home extends javax.swing.JFrame {
                 }
             }
             if(check){
-                student student = new student(txt_namestudent.getText(),txt_studentid.getText());
-                model.addRow(new Object[]{txt_namestudent.getText(),txt_studentid.getText(),"none"});
+                student student = new student(txt_namestudent.getText(),txt_mssv.getText());
+                model.addRow(new Object[]{txt_namestudent.getText(),txt_mssv.getText(),"none"});
             }
     }//GEN-LAST:event_btn_editstudentActionPerformed
 
@@ -1436,7 +1618,7 @@ public class Home extends javax.swing.JFrame {
         // TODO add your handling code here:
         DefaultTableModel model = (DefaultTableModel)tb_student.getModel();
         txt_namestudent.setText(model.getValueAt(tb_student.getSelectedRow(),0).toString());
-        txt_studentid.setText(model.getValueAt(tb_student.getSelectedRow(),1).toString());
+        txt_mssv.setText(model.getValueAt(tb_student.getSelectedRow(),1).toString());
         
     }//GEN-LAST:event_tb_studentMouseClicked
 
@@ -1445,8 +1627,15 @@ public class Home extends javax.swing.JFrame {
         DefaultTableModel model = (DefaultTableModel)tb_studentlist.getModel();
         lb_namefinal.setText(model.getValueAt(tb_studentlist.getSelectedRow(),0).toString());
         lb_studentidfinal.setText(model.getValueAt(tb_studentlist.getSelectedRow(),1).toString());
-        lb_classidfinal.setText(jComboBox1.getSelectedObjects().toString());
+        lb_classidfinal.setText(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getCode());
+        StatisticGetRollTimeStudent(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getId(), model.getValueAt(tb_studentlist.getSelectedRow(),1).toString());
     }//GEN-LAST:event_tb_studentlistMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        GetRollReportResponse reportData=StatisticGetRollReport(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getId());
+        System.out.println(reportData);
+    }//GEN-LAST:event_jButton1ActionPerformed
     
     /**
      * @param args the command line arguments
@@ -1514,7 +1703,6 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> combox_chooseclass;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton8;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JComboBox<String> jComboBox5;
     private javax.swing.JComboBox<String> jComboBox6;
     private javax.swing.JLabel jLabel1;
@@ -1560,7 +1748,6 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField10;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField7;
@@ -1583,13 +1770,15 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JPanel pnl_statistic;
     private javax.swing.JPanel pnl_student;
     private javax.swing.JTable rollTable;
+    private javax.swing.JComboBox<String> statistic_class_combobox;
+    private javax.swing.JTextArea statistic_time_joined;
     private javax.swing.JTable tb_class;
     private javax.swing.JTable tb_student;
     private javax.swing.JTable tb_studentlist;
     private javax.swing.JToggleButton togbtn_start;
-    private javax.swing.JTextField txt_classid;
+    private javax.swing.JTextField txt_classcode;
+    private javax.swing.JTextField txt_mssv;
     private javax.swing.JTextField txt_nameclass;
     private javax.swing.JTextField txt_namestudent;
-    private javax.swing.JTextField txt_studentid;
     // End of variables declaration//GEN-END:variables
 }
