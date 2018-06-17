@@ -19,12 +19,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -34,14 +32,11 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
-import org.apache.http.client.utils.DateUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 
@@ -1564,13 +1559,25 @@ public class Home extends javax.swing.JFrame {
 
     private void statistic_class_comboboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statistic_class_comboboxActionPerformed
         // TODO add your handling code here
+        new Thread(new Runnable() {
+          public void run() {
         System.out.println("he");
         DefaultTableModel model = (DefaultTableModel) statistic_tb_student.getModel();
         GetRollReportResponse reportData=StatisticGetRollReport(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getId());
         model.setRowCount(0);
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                
+                    System.out.println(reportData==null);
         for(int i=0;i<reportData.getData().getRolls().size();i++){
             model.addRow(new Object[]{reportData.getData().getRolls().get(i).getName(),reportData.getData().getRolls().get(i).getMssv(),reportData.getData().getRolls().get(i).getCount()});
         }
+                }
+              });
+
+          }
+        }).start();
+
     }//GEN-LAST:event_statistic_class_comboboxActionPerformed
 
     private void btn_editclassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_editclassActionPerformed
