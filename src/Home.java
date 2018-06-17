@@ -1237,35 +1237,35 @@ public class Home extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnl_infostudentLayout.createSequentialGroup()
-                        .addComponent(jLabel28)
-                        .addGap(44, 44, 44)
-                        .addComponent(lb_namefinal))
-                    .addGroup(pnl_infostudentLayout.createSequentialGroup()
                         .addComponent(jLabel31)
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(pnl_infostudentLayout.createSequentialGroup()
-                        .addGroup(pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel30, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnl_infostudentLayout.createSequentialGroup()
-                                .addComponent(jLabel29)
-                                .addGap(18, 18, 18)
-                                .addComponent(lb_studentidfinal)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lb_classidfinal)))
+                    .addGroup(pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(pnl_infostudentLayout.createSequentialGroup()
+                            .addComponent(jLabel28)
+                            .addGap(44, 44, 44)
+                            .addComponent(lb_namefinal, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnl_infostudentLayout.createSequentialGroup()
+                            .addGroup(pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel30, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel29, javax.swing.GroupLayout.Alignment.LEADING))
+                            .addGap(18, 18, 18)
+                            .addGroup(pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lb_classidfinal, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lb_studentidfinal, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(31, Short.MAX_VALUE))
         );
         pnl_infostudentLayout.setVerticalGroup(
             pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_infostudentLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel28)
-                    .addComponent(lb_namefinal))
+                .addGroup(pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lb_namefinal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel28, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel29)
-                    .addComponent(lb_studentidfinal))
+                .addGroup(pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel29, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lb_studentidfinal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnl_infostudentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel30)
@@ -1729,10 +1729,11 @@ public class Home extends javax.swing.JFrame {
         //System.out.println(reportData.getData().getDates());
         //System.out.println(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getName());
   
-        JFileChooser savefile = new JFileChooser();
-        savefile.setDialogTitle("Save a File");
+        
         System.out.println(reportData.getData().getDates().get(0));
         FileFilter filter = new FileNameExtensionFilter("Excel file", "xls", "xlsx");
+        JFileChooser savefile = new JFileChooser();
+        savefile.setDialogTitle("Save a File");
         savefile.setFileFilter(filter);
     
         int result = savefile.showSaveDialog(null);
@@ -1748,20 +1749,53 @@ public class Home extends javax.swing.JFrame {
                     if(dialogButton == JOptionPane.OK_OPTION){
         
                         XSSFWorkbook workbook = new XSSFWorkbook();
-                        XSSFSheet sheet = workbook.createSheet(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getCode());
-                        int rowNum = 0;
-                        Row firstRow = sheet.createRow(rowNum++);
-                        Cell firstCell = firstRow.createCell(0);
-                        firstCell.setCellValue(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getName());
-         
-                        try {
-                            FileOutputStream outputStream = new FileOutputStream(file);
-                            workbook.write(outputStream);
-                            workbook.close();
-      
-                        } catch (IOException ex) {
-                            Logger.getLogger(Home.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                XSSFSheet sheet = workbook.createSheet(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getCode());
+                int rowNum = 0;
+                //Lấy tên lớp và mã lớp
+                Row firstRow = sheet.createRow(rowNum++);
+                Cell firstCell = firstRow.createCell(0);
+                firstCell.setCellValue(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getName());
+                Cell secondCell = firstRow.createCell(1);
+                secondCell.setCellValue(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getCode());
+                Row row = sheet.createRow(rowNum++);
+                Cell currentCell;
+                currentCell = row.createCell(0);
+                currentCell.setCellValue("Tên");
+                currentCell = row.createCell(1);
+                currentCell.setCellValue("MSSV");
+                currentCell = row.createCell(2);
+                currentCell.setCellValue("Tổng buổi tham gia");
+                for(int i=0;i<reportData.getData().getDates().size();i++){
+                    currentCell = row.createCell(i+3);
+                    String time_filter = reportData.getData().getDates().get(i).getTime().substring(0,10);
+                    currentCell.setCellValue(time_filter);
+                }
+                for(int j=0;j<reportData.getData().getRolls().size();j++){
+                    row = sheet.createRow(rowNum++);
+                    currentCell = row.createCell(0);
+                    currentCell.setCellValue(reportData.getData().getRolls().get(j).getName());
+                    currentCell = row.createCell(1);
+                    currentCell.setCellValue(reportData.getData().getRolls().get(j).getMssv());
+                    currentCell = row.createCell(2);
+                    currentCell.setCellValue(reportData.getData().getRolls().get(j).getCount());
+                    for(int k=0;k<reportData.getData().getRolls().get(j).getRolls().size();k++)
+                    {
+                        currentCell = row.createCell(k+3);
+                        if(reportData.getData().getRolls().get(j).getRolls().get(j).getChecked()==true)
+                            currentCell.setCellValue("x");                        
+                        else currentCell.setCellValue("");
+                    }                                       
+                }
+                
+                    
+                    try {
+                        FileOutputStream outputStream = new FileOutputStream(file+".xlsx");
+                        workbook.write(outputStream);
+                        workbook.close();
+               
+                    } catch (IOException ex) {
+                        Logger.getLogger(Home.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     }
                 }
             else{
@@ -1807,7 +1841,7 @@ public class Home extends javax.swing.JFrame {
                 
                     
                     try {
-                        FileOutputStream outputStream = new FileOutputStream(file);
+                        FileOutputStream outputStream = new FileOutputStream(file+".xlsx");
                         workbook.write(outputStream);
                         workbook.close();
                
@@ -1816,6 +1850,7 @@ public class Home extends javax.swing.JFrame {
                     }
                 
             }
+            JOptionPane.showMessageDialog(null,"Export to Excel successfully");
         }
         
     }//GEN-LAST:event_jButton1ActionPerformed
