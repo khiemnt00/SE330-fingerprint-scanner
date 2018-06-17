@@ -129,11 +129,11 @@ public class Home extends javax.swing.JFrame {
             Gson gson = new GsonBuilder().create();
             GetCurrentRollRespone r=new GetCurrentRollRespone();
             r=gson.fromJson(rsp, GetCurrentRollRespone.class);
-            SimpleDateFormat s = new SimpleDateFormat("dd-MM-yyyy   hh:mm:ss");
+
             DefaultTableModel model = (DefaultTableModel) rollTable.getModel();
             model.setRowCount(0);
             for (int i=0;i<r.getData().getRolls().size();i++){
-                model.addRow(new Object[]{r.getData().getRolls().get(i).getName(), r.getData().getRolls().get(i).getMssv(), r.getData().getRolls().get(i).getTime()});
+                model.addRow(new Object[]{r.getData().getRolls().get(i).getName(), r.getData().getRolls().get(i).getMssv(),"Date: " + r.getData().getRolls().get(i).getTime().substring(5,10)+" | Time: "+r.getData().getRolls().get(i).getTime().substring(12,19)});
             }
         }
         catch(Exception e){
@@ -207,7 +207,7 @@ public class Home extends javax.swing.JFrame {
             r=gson.fromJson(rsp, GetCurrentRollRespone.class);
             statistic_time_joined.setText("");
             for (int i=0;i<r.getData().getRolls().size();i++){
-                statistic_time_joined.append(r.getData().getRolls().get(i).getTime().substring(0,10)+"-"+r.getData().getRolls().get(i).getTime().substring(12,19)+"\n");
+                statistic_time_joined.append("Date: " + r.getData().getRolls().get(i).getTime().substring(5,10)+" | Time: "+r.getData().getRolls().get(i).getTime().substring(12,19)+"\n");
             }
 
         }
