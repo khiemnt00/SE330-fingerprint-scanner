@@ -1,5 +1,5 @@
 nbproject/private/
-build/classes
+build/classes/*
 build/
 nbbuild/
 nbdist/
