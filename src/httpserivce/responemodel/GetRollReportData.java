@@ -20,7 +20,7 @@ public class GetRollReportData {
 private List<ReportDate> dates = null;
 @SerializedName("rolls")
 @Expose
-private List<Roll> rolls = null;
+private List<ReportRoll> rolls = null;
 
 public List<ReportDate> getDates() {
 return dates;
@@ -30,11 +30,18 @@ public void setDates(List<ReportDate> dates) {
 this.dates = dates;
 }
 
-public List<Roll> getRolls() {
+public List<ReportRoll> getRolls() {
 return rolls;
 }
 
-public void setRolls(List<Roll> rolls) {
+public void setRolls(List<ReportRoll> rolls) {
 this.rolls = rolls;
 }   
+
+    @Override
+    public String toString() {
+        return "GetRollReportData{" + "dates=" + dates + ", rolls=" + rolls + '}';
+    }
+
+
 }

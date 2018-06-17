@@ -90,8 +90,8 @@ public class Home extends javax.swing.JFrame {
             }
         }).start();
         GetAllClass();
-        GetAllStudentByClassID(9);
-        GetCurrentRollByClassID(9);
+//        InitStudentByClassID(9);
+//        GetCurrentRollByClassID(9);
        
     }
     
@@ -108,26 +108,30 @@ public class Home extends javax.swing.JFrame {
             for (int i=0;i<r.getData().getClasses().size();i++){
                 rootClasses.add(r.getData().getClasses().get(i));
                 model.addRow(new Object[]{r.getData().getClasses().get(i).getName(), r.getData().getClasses().get(i).getCode(), r.getData().getClasses().get(i).getSemester(),r.getData().getClasses().get(i).getYear()});
-                combox_chooseclass.addItem(r.getData().getClasses().get(i).getCode()+ " HK" + r.getData().getClasses().get(i).getSemester()+ " " + r.getData().getClasses().get(i).getYear());
-                combobox_classidstudent.addItem(r.getData().getClasses().get(i).getCode()+ " HK" + r.getData().getClasses().get(i).getSemester()+ " " + r.getData().getClasses().get(i).getYear());
+                dashboard_combox_chooseclass.addItem(r.getData().getClasses().get(i).getCode()+ " HK" + r.getData().getClasses().get(i).getSemester()+ " " + r.getData().getClasses().get(i).getYear());
+                student_combobox_class.addItem(r.getData().getClasses().get(i).getCode()+ " HK" + r.getData().getClasses().get(i).getSemester()+ " " + r.getData().getClasses().get(i).getYear());
                 statistic_class_combobox.addItem(r.getData().getClasses().get(i).getCode()+ " HK" + r.getData().getClasses().get(i).getSemester()+ " " + r.getData().getClasses().get(i).getYear());
-
             }
+//            dashboard_combox_chooseclass.setSelectedIndex(-1);
+//                combobox_classidstudent.setSelectedIndex(-1);
+//                statistic_class_combobox.setSelectedIndex(-1);
 
         }catch(Exception e){
             System.err.println(e);
         }
     }
     
-    void GetCurrentRollByClassID(int class_id){
-                    HttpService httpsv=new HttpService();
+    void RenderCurrentRollByClassID(int class_id){
+            HttpService httpsv=new HttpService();
+            System.out.println("render current roll:"+String.valueOf(class_id));
             try {
-            String rsp=httpsv.GetCurentRolls();
+            String rsp=httpsv.GetCurentRolls(class_id);
             Gson gson = new GsonBuilder().create();
             GetCurrentRollRespone r=new GetCurrentRollRespone();
             r=gson.fromJson(rsp, GetCurrentRollRespone.class);
             SimpleDateFormat s = new SimpleDateFormat("dd-MM-yyyy   hh:mm:ss");
             DefaultTableModel model = (DefaultTableModel) rollTable.getModel();
+            model.setRowCount(0);
             for (int i=0;i<r.getData().getRolls().size();i++){
                 model.addRow(new Object[]{r.getData().getRolls().get(i).getName(), r.getData().getRolls().get(i).getMssv(), r.getData().getRolls().get(i).getTime()});
             }
@@ -137,14 +141,15 @@ public class Home extends javax.swing.JFrame {
         }
     }
     
-        void GetAllStudentByClassID(int class_id){
+        void RenderStudentByClassID(int class_id){
              HttpService httpsv=new HttpService();
             try {
-            String rsp=httpsv.GetAllStudent(9);
+            String rsp=httpsv.GetAllStudent(class_id);
             Gson gson = new GsonBuilder().create();
             GetAllStudentResponse r=new GetAllStudentResponse();
             r=gson.fromJson(rsp, GetAllStudentResponse.class);
-            DefaultTableModel model = (DefaultTableModel) tb_student.getModel();
+            DefaultTableModel model = (DefaultTableModel) student_tb_student.getModel();
+            model.setRowCount(0);
             for (int i=0;i<r.getData().getStudents().size();i++){
                 model.addRow(new Object[]{r.getData().getStudents().get(i).getName(), r.getData().getStudents().get(i).getMssv(), r.getData().getStudents().get(i).getAutheticated()});
             }
@@ -153,6 +158,27 @@ public class Home extends javax.swing.JFrame {
         catch(Exception e){
             System.err.println(e);
         }
+        }
+        
+    GetAllStudentResponse GetAllStudentByClassID(int class_id){
+             HttpService httpsv=new HttpService();
+            try {
+            String rsp=httpsv.GetAllStudent(9);
+            Gson gson = new GsonBuilder().create();
+            GetAllStudentResponse r=new GetAllStudentResponse();
+            r=gson.fromJson(rsp, GetAllStudentResponse.class);
+//            DefaultTableModel model = (DefaultTableModel) tb_student.getModel();
+//            for (int i=0;i<r.getData().getStudents().size();i++){
+//                model.addRow(new Object[]{r.getData().getStudents().get(i).getName(), r.getData().getStudents().get(i).getMssv(), r.getData().getStudents().get(i).getAutheticated()});
+//            }
+            return r;
+
+        }
+        catch(Exception e){
+            System.err.println(e);
+        }
+            
+            return null;
         }
         int CreateClass(AttendenceClass attendenceClass){
              HttpService httpsv=new HttpService();
@@ -284,7 +310,7 @@ public class Home extends javax.swing.JFrame {
         rollTable = new javax.swing.JTable();
         jLabel9 = new javax.swing.JLabel();
         lb_date = new javax.swing.JLabel();
-        combox_chooseclass = new javax.swing.JComboBox<>();
+        dashboard_combox_chooseclass = new javax.swing.JComboBox<>();
         jLabel11 = new javax.swing.JLabel();
         lb_time = new javax.swing.JLabel();
         pnl_class = new javax.swing.JPanel();
@@ -319,10 +345,10 @@ public class Home extends javax.swing.JFrame {
         btn_addstudent = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        tb_student = new javax.swing.JTable();
+        student_tb_student = new javax.swing.JTable();
         btn_deletestudent = new javax.swing.JButton();
         btn_editstudent = new javax.swing.JButton();
-        combobox_classidstudent = new javax.swing.JComboBox<>();
+        student_combobox_class = new javax.swing.JComboBox<>();
         pnl_settings = new javax.swing.JPanel();
         jLabel22 = new javax.swing.JLabel();
         jLabel23 = new javax.swing.JLabel();
@@ -343,7 +369,7 @@ public class Home extends javax.swing.JFrame {
         jLabel26 = new javax.swing.JLabel();
         jTextField7 = new javax.swing.JTextField();
         jScrollPane6 = new javax.swing.JScrollPane();
-        tb_studentlist = new javax.swing.JTable();
+        statistic_tb_student = new javax.swing.JTable();
         jLabel27 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
@@ -574,7 +600,17 @@ public class Home extends javax.swing.JFrame {
 
         lb_date.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
 
-        combox_chooseclass.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        dashboard_combox_chooseclass.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        dashboard_combox_chooseclass.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                dashboard_combox_chooseclassItemStateChanged(evt);
+            }
+        });
+        dashboard_combox_chooseclass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dashboard_combox_chooseclassActionPerformed(evt);
+            }
+        });
 
         jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel11.setText("Choose Class :");
@@ -606,7 +642,7 @@ public class Home extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jLabel11)
                                 .addGap(18, 18, 18)
-                                .addComponent(combox_chooseclass, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(dashboard_combox_chooseclass, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -625,7 +661,7 @@ public class Home extends javax.swing.JFrame {
                 .addGroup(pnl_dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(lb_status)
-                    .addComponent(combox_chooseclass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dashboard_combox_chooseclass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 51, Short.MAX_VALUE)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -853,7 +889,7 @@ public class Home extends javax.swing.JFrame {
             }
         });
 
-        tb_student.setModel(new javax.swing.table.DefaultTableModel(
+        student_tb_student.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -869,12 +905,12 @@ public class Home extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        tb_student.addMouseListener(new java.awt.event.MouseAdapter() {
+        student_tb_student.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tb_studentMouseClicked(evt);
+                student_tb_studentMouseClicked(evt);
             }
         });
-        jScrollPane4.setViewportView(tb_student);
+        jScrollPane4.setViewportView(student_tb_student);
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
@@ -901,6 +937,12 @@ public class Home extends javax.swing.JFrame {
             }
         });
 
+        student_combobox_class.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                student_combobox_classActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnl_studentLayout = new javax.swing.GroupLayout(pnl_student);
         pnl_student.setLayout(pnl_studentLayout);
         pnl_studentLayout.setHorizontalGroup(
@@ -921,7 +963,7 @@ public class Home extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(pnl_studentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txt_mssv, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(combobox_classidstudent, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(student_combobox_class, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(pnl_studentLayout.createSequentialGroup()
                         .addGroup(pnl_studentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnl_studentLayout.createSequentialGroup()
@@ -977,7 +1019,7 @@ public class Home extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(pnl_studentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel20)
-                            .addComponent(combobox_classidstudent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(student_combobox_class, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(pnl_studentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btn_scan)
@@ -1099,25 +1141,20 @@ public class Home extends javax.swing.JFrame {
 
         jLabel26.setText("Search");
 
-        tb_studentlist.setModel(new javax.swing.table.DefaultTableModel(
+        statistic_tb_student.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"Tan", "14520804", "4"},
-                {"Tuyen", "14521066", "5"},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+
             },
             new String [] {
                 "Name", "Mssv", "Attendance"
             }
         ));
-        tb_studentlist.addMouseListener(new java.awt.event.MouseAdapter() {
+        statistic_tb_student.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tb_studentlistMouseClicked(evt);
+                statistic_tb_studentMouseClicked(evt);
             }
         });
-        jScrollPane6.setViewportView(tb_studentlist);
+        jScrollPane6.setViewportView(statistic_tb_student);
 
         jLabel27.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel27.setText("Students list");
@@ -1335,12 +1372,12 @@ public class Home extends javax.swing.JFrame {
 
     private void btn_deletestudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deletestudentActionPerformed
         // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel)tb_student.getModel();
+        DefaultTableModel model = (DefaultTableModel)student_tb_student.getModel();
         int dialogButton = JOptionPane.YES_NO_OPTION;
-        JOptionPane.showConfirmDialog(null,"Delete student: " + model.getValueAt(tb_student.getSelectedRow(), 0).toString() + " ?", "Warning", dialogButton);
+        JOptionPane.showConfirmDialog(null,"Delete student: " + model.getValueAt(student_tb_student.getSelectedRow(), 0).toString() + " ?", "Warning", dialogButton);
         if(dialogButton == JOptionPane.YES_OPTION)
         {
-            model.removeRow(tb_student.getSelectedRow());
+            model.removeRow(student_tb_student.getSelectedRow());
             txt_nameclass.setText("");
             txt_classcode.setText("");
         }
@@ -1415,8 +1452,8 @@ public class Home extends javax.swing.JFrame {
             if (rcode==200) {
                 rootClasses.add(attendenceClass);
                 model.addRow(row);
-                combox_chooseclass.addItem(txt_classcode.getText() + " HK" + combobox_semester.getSelectedItem() + " " + combobox_year.getSelectedItem());
-                combobox_classidstudent.addItem(txt_classcode.getText() + " HK" + combobox_semester.getSelectedItem() + " " + combobox_year.getSelectedItem());
+                dashboard_combox_chooseclass.addItem(txt_classcode.getText() + " HK" + combobox_semester.getSelectedItem() + " " + combobox_year.getSelectedItem());
+                student_combobox_class.addItem(txt_classcode.getText() + " HK" + combobox_semester.getSelectedItem() + " " + combobox_year.getSelectedItem());
             }
 }
         }
@@ -1433,7 +1470,7 @@ public class Home extends javax.swing.JFrame {
 
     private void btn_importclassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_importclassActionPerformed
         // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel)tb_student.getModel();
+        DefaultTableModel model = (DefaultTableModel)student_tb_student.getModel();
         DefaultTableModel model2 = (DefaultTableModel)tb_class.getModel();
         String hocky = new String();
         String namhoc = new String();
@@ -1502,10 +1539,10 @@ public class Home extends javax.swing.JFrame {
                 
                 workbook.close();
                 model2.addRow(new Object[]{tenmonhoc,mamonhoc,hocky,namhoc});
-                combox_chooseclass.addItem(mamonhoc);
-                combobox_classidstudent.addItem(mamonhoc);
-                combox_chooseclass.addItem(mamonhoc + " HK" + hocky + " " + namhoc);
-                combobox_classidstudent.addItem(mamonhoc  + " HK" + hocky + " " + namhoc);
+                dashboard_combox_chooseclass.addItem(mamonhoc);
+                student_combobox_class.addItem(mamonhoc);
+                dashboard_combox_chooseclass.addItem(mamonhoc + " HK" + hocky + " " + namhoc);
+                student_combobox_class.addItem(mamonhoc  + " HK" + hocky + " " + namhoc);
 
                 statistic_class_combobox.addItem(mamonhoc);
             } catch (IOException ex) {
@@ -1516,18 +1553,24 @@ public class Home extends javax.swing.JFrame {
 
     private void statistic_class_comboboxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_statistic_class_comboboxItemStateChanged
         // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel) tb_studentlist.getModel();
-        String classid = statistic_class_combobox.getSelectedObjects().toString().trim();
-//        System.out.println(statistic_class_combobox.getSelectedIndex());
-//        System.out.println(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getName());
-        
-        
+//                System.out.println(statistic_class_combobox.getSelectedIndex());
+//        DefaultTableModel model = (DefaultTableModel) statistic_tb_student.getModel();
+////        GetRollReportResponse reportData=StatisticGetRollReport(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getId());
+//        model.setRowCount(0);
+//        for(int i=0;i<reportData.getData().getRolls().size();i++){
+//            model.addRow(new Object[]{reportData.getData().getRolls().get(i).getName(),reportData.getData().getRolls().get(i).getMssv(),reportData.getData().getRolls().get(i).getCount()});
+//        }
     }//GEN-LAST:event_statistic_class_comboboxItemStateChanged
 
     private void statistic_class_comboboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statistic_class_comboboxActionPerformed
-        // TODO add your handling code here:
-        System.out.println(statistic_class_combobox.getSelectedIndex());
-
+        // TODO add your handling code here
+        System.out.println("he");
+        DefaultTableModel model = (DefaultTableModel) statistic_tb_student.getModel();
+        GetRollReportResponse reportData=StatisticGetRollReport(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getId());
+        model.setRowCount(0);
+        for(int i=0;i<reportData.getData().getRolls().size();i++){
+            model.addRow(new Object[]{reportData.getData().getRolls().get(i).getName(),reportData.getData().getRolls().get(i).getMssv(),reportData.getData().getRolls().get(i).getCount()});
+        }
     }//GEN-LAST:event_statistic_class_comboboxActionPerformed
 
     private void btn_editclassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_editclassActionPerformed
@@ -1567,7 +1610,7 @@ public class Home extends javax.swing.JFrame {
 
     private void btn_addstudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addstudentActionPerformed
         // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel)tb_student.getModel();
+        DefaultTableModel model = (DefaultTableModel)student_tb_student.getModel();
         if(txt_namestudent.getText().isEmpty()==true||txt_mssv.getText().isEmpty()==true){
             JOptionPane.showMessageDialog(null,"Missing field ! \nPlease input again");
         }
@@ -1597,7 +1640,7 @@ public class Home extends javax.swing.JFrame {
 
     private void btn_editstudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_editstudentActionPerformed
         // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel)tb_student.getModel();
+        DefaultTableModel model = (DefaultTableModel)student_tb_student.getModel();
         String checkdupid = txt_mssv.getText();
             boolean check = true;
             int rows = model.getRowCount();
@@ -1614,28 +1657,46 @@ public class Home extends javax.swing.JFrame {
             }
     }//GEN-LAST:event_btn_editstudentActionPerformed
 
-    private void tb_studentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tb_studentMouseClicked
+    private void student_tb_studentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_student_tb_studentMouseClicked
         // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel)tb_student.getModel();
-        txt_namestudent.setText(model.getValueAt(tb_student.getSelectedRow(),0).toString());
-        txt_mssv.setText(model.getValueAt(tb_student.getSelectedRow(),1).toString());
+        DefaultTableModel model = (DefaultTableModel)student_tb_student.getModel();
+        txt_namestudent.setText(model.getValueAt(student_tb_student.getSelectedRow(),0).toString());
+        txt_mssv.setText(model.getValueAt(student_tb_student.getSelectedRow(),1).toString());
         
-    }//GEN-LAST:event_tb_studentMouseClicked
+    }//GEN-LAST:event_student_tb_studentMouseClicked
 
-    private void tb_studentlistMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tb_studentlistMouseClicked
+    private void statistic_tb_studentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_statistic_tb_studentMouseClicked
         // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel)tb_studentlist.getModel();
-        lb_namefinal.setText(model.getValueAt(tb_studentlist.getSelectedRow(),0).toString());
-        lb_studentidfinal.setText(model.getValueAt(tb_studentlist.getSelectedRow(),1).toString());
+        DefaultTableModel model = (DefaultTableModel)statistic_tb_student.getModel();
+        lb_namefinal.setText(model.getValueAt(statistic_tb_student.getSelectedRow(),0).toString());
+        lb_studentidfinal.setText(model.getValueAt(statistic_tb_student.getSelectedRow(),1).toString());
         lb_classidfinal.setText(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getCode());
-        StatisticGetRollTimeStudent(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getId(), model.getValueAt(tb_studentlist.getSelectedRow(),1).toString());
-    }//GEN-LAST:event_tb_studentlistMouseClicked
+        StatisticGetRollTimeStudent(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getId(), model.getValueAt(statistic_tb_student.getSelectedRow(),1).toString());
+    }//GEN-LAST:event_statistic_tb_studentMouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         GetRollReportResponse reportData=StatisticGetRollReport(rootClasses.get(statistic_class_combobox.getSelectedIndex()).getId());
         System.out.println(reportData);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void dashboard_combox_chooseclassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dashboard_combox_chooseclassActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_dashboard_combox_chooseclassActionPerformed
+
+    private void dashboard_combox_chooseclassItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dashboard_combox_chooseclassItemStateChanged
+        // TODO add your handling code here:
+
+        System.out.println("sle:"+dashboard_combox_chooseclass.getSelectedIndex());
+        if(dashboard_combox_chooseclass.getSelectedIndex()>=0)
+        RenderCurrentRollByClassID(rootClasses.get(dashboard_combox_chooseclass.getSelectedIndex()).getId());
+    }//GEN-LAST:event_dashboard_combox_chooseclassItemStateChanged
+
+    private void student_combobox_classActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_student_combobox_classActionPerformed
+        // TODO add your handling code here:
+        if(student_combobox_class.getSelectedIndex()>=0)
+            RenderStudentByClassID(rootClasses.get(student_combobox_class.getSelectedIndex()).getId());
+    }//GEN-LAST:event_student_combobox_classActionPerformed
     
     /**
      * @param args the command line arguments
@@ -1697,10 +1758,9 @@ public class Home extends javax.swing.JFrame {
     private rojerusan.RSButtonIconI btn_settings;
     private rojerusan.RSButtonIconI btn_statistic;
     private rojerusan.RSButtonIconI btn_student;
-    private javax.swing.JComboBox<String> combobox_classidstudent;
     private javax.swing.JComboBox<String> combobox_semester;
     private javax.swing.JComboBox<String> combobox_year;
-    private javax.swing.JComboBox<String> combox_chooseclass;
+    private javax.swing.JComboBox<String> dashboard_combox_chooseclass;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton8;
     private javax.swing.JComboBox<String> jComboBox5;
@@ -1771,10 +1831,11 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JPanel pnl_student;
     private javax.swing.JTable rollTable;
     private javax.swing.JComboBox<String> statistic_class_combobox;
+    private javax.swing.JTable statistic_tb_student;
     private javax.swing.JTextArea statistic_time_joined;
+    private javax.swing.JComboBox<String> student_combobox_class;
+    private javax.swing.JTable student_tb_student;
     private javax.swing.JTable tb_class;
-    private javax.swing.JTable tb_student;
-    private javax.swing.JTable tb_studentlist;
     private javax.swing.JToggleButton togbtn_start;
     private javax.swing.JTextField txt_classcode;
     private javax.swing.JTextField txt_mssv;

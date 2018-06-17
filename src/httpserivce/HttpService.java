@@ -57,10 +57,10 @@ public class HttpService {
 
 	}
     
-    public String GetCurentRolls() throws Exception {
+    public String GetCurentRolls(int class_id) throws Exception {
         String url = "http://cbfarmv2.combrosidc.com:4022/roll/current";
         URIBuilder builder = new URIBuilder(url);
-        builder.addParameter("class_id", "9");
+        builder.addParameter("class_id", String.valueOf(class_id));
 
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet httpGet = new HttpGet(builder.build());
