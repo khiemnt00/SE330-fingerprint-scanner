@@ -22,7 +22,7 @@ private Integer rcode;
 private String message;
 @SerializedName("data")
 @Expose
-private GetCurrentRollData data;
+private GetRollReportData data;
 @SerializedName("status")
 @Expose
 private Boolean status;
@@ -43,11 +43,11 @@ public void setMessage(String message) {
 this.message = message;
 }
 
-public GetCurrentRollData getData() {
+public GetRollReportData getData() {
 return data;
 }
 
-public void setData(GetCurrentRollData data) {
+public void setData(GetRollReportData data) {
 this.data = data;
 }
 
