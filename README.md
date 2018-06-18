@@ -18,10 +18,24 @@ Attendence System là phần mềm điểm danh chạy trên nền java sử d�
 
 ![alt tag](Picture1.png "Sơ đồ giao diện tổng thể")
 
-### Link demo
+
+## Built With
+
+* [Java jdk](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) - Java SE Development Kit 8
+* [Netbean](https://netbeans.org/downloads/) - NetBeans IDE
+* [Gin](https://rometools.github.io/rome/) - HTTP web framework written in Go (Golang) 
+*  [Docker](https://www.docker.com) - Software containerization platform
+* [Rancher](https://rancher.com) - Run containers in production
+
+## Screenshoot
+
+![alt tag](loginscreen.png "Sơ đồ giao diện tổng thể")
+![alt tag](rollscreen.png "Sơ đồ giao diện tổng thể")
+![alt tag](classscreen.png "Sơ đồ giao diện tổng thể")
+![alt tag](studentscreen.png "Sơ đồ giao diện tổng thể")
+![alt tag](report.png "Sơ đồ giao diện tổng thể")
+![alt tag](rancher.png "Sơ đồ giao diện tổng thể")
+
+
+## Link demo
 * [Attendence System Demo](https://youtu.be/fVrKl7UyIOw) - 
-
-
-### Installation
-
-Attendence System yêu cầu [Java](https://netbeans.org/downloads/)  để chaỵ.
