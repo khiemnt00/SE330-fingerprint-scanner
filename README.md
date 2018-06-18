@@ -16,8 +16,7 @@ Attendence System là phần mềm điểm danh chạy trên nền java sử d�
   - Quét vân tay
   - Xem thống kê, xuất file báo cáo
 
-
-![picture](https://imgur.com/a/aWFdF9o)
+![picture](Picture1.png)
 ### Link demo
 * [Attendence System Demo](https://youtu.be/fVrKl7UyIOw) - 
 
