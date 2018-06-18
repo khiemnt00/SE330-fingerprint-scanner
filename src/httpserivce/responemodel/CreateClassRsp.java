@@ -5,6 +5,10 @@
  */
 package httpserivce.responemodel;
 
+/**
+ *
+ * @author tuyen
+ */
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -15,7 +19,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class CreateClassRespone {
+public class CreateClassRsp {
 
 @SerializedName("rcode")
 @Expose
@@ -25,7 +29,7 @@ private Integer rcode;
 private String message;
 @SerializedName("data")
 @Expose
-private Object data;
+private CreateClassData data;
 @SerializedName("status")
 @Expose
 private Boolean status;
@@ -46,11 +50,11 @@ public void setMessage(String message) {
 this.message = message;
 }
 
-public Object getData() {
+public CreateClassData getData() {
 return data;
 }
 
-public void setData(Object data) {
+public void setData(CreateClassData data) {
 this.data = data;
 }
 

@@ -18,12 +18,12 @@ public class FingerData {
     @SerializedName("msg_id")
     @Expose
     private String msgId;
-    @SerializedName("type")
+    @SerializedName("cmd")
     @Expose
     private Integer type;
     @SerializedName("data")
     @Expose
-    private Object data;
+    private Integer data;
 
     public String getMsgId() {
     return msgId;
@@ -41,12 +41,17 @@ public class FingerData {
     this.type = type;
     }
 
-    public Object getData() {
+    public Integer getData() {
     return data;
     }
 
-    public void setData(Object data) {
+    public void setData(Integer data) {
     this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        return "FingerData{" + "msgId=" + msgId + ", type=" + type + ", data=" + data + '}';
     }
 
 }

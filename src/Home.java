@@ -1,11 +1,13 @@
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import hardware.Command;
 import hardware.FingerData;
 import hardware.FingerHW;
 import httpserivce.HttpService;
 import httpserivce.responemodel.AttendenceClass;
 import httpserivce.responemodel.CreateClassRespone;
+import httpserivce.responemodel.CreateClassRespone1;
 import httpserivce.responemodel.GetAllStudentResponse;
 import httpserivce.responemodel.GetClassAllResponse;
 import httpserivce.responemodel.GetCurrentRollRespone;
@@ -63,6 +65,9 @@ public class Home extends javax.swing.JFrame {
      * Creates new form Home
      */
     public List<AttendenceClass> rootClasses=new ArrayList<AttendenceClass>();
+    public int scanFingerID=-1;
+                    FingerHW fingerHW=new FingerHW();
+
     public Home() {
         initComponents();
         showdate();
@@ -86,7 +91,7 @@ public class Home extends javax.swing.JFrame {
         
         new Thread(new Runnable() {
             public void run() {
-      //        connectHardware();
+              connectHardware();
             }
         }).start();
         GetAllClass();
@@ -150,9 +155,9 @@ public class Home extends javax.swing.JFrame {
             r=gson.fromJson(rsp, GetAllStudentResponse.class);
             DefaultTableModel model = (DefaultTableModel) student_tb_student.getModel();
             model.setRowCount(0);
-            for (int i=0;i<r.getData().getStudents().size();i++){
-                model.addRow(new Object[]{r.getData().getStudents().get(i).getName(), r.getData().getStudents().get(i).getMssv(), r.getData().getStudents().get(i).getAutheticated()});
-            }
+//            for (int i=0;i<r.getData().getStudents().size();i++){
+//                model.addRow(new Object[]{r.getData().getStudents().get(i).getName(), r.getData().getStudents().get(i).getMssv(), r.getData().getStudents().get(i).getAutheticated()});
+//            }
 
         }
         catch(Exception e){
@@ -195,6 +200,22 @@ public class Home extends javax.swing.JFrame {
         }
             return 0;
       }
+        
+       CreateClassRespone1 CreateClassRsp(AttendenceClass attendenceClass){
+             HttpService httpsv=new HttpService();
+            try {
+            String rsp=httpsv.CreateClass(attendenceClass);
+            Gson gson = new GsonBuilder().create();
+            CreateClassRespone1 r=new CreateClassRespone1();
+            r=gson.fromJson(rsp, CreateClassRespone1.class);
+            return r;
+
+        }
+        catch(Exception e){
+            System.err.println(e);
+        }
+            return null;
+      }
     
         void StatisticGetRollTimeStudent(int class_id,String mssv){
             System.out.println(String.valueOf(class_id));
@@ -234,6 +255,23 @@ public class Home extends javax.swing.JFrame {
         
         return null;
     }
+      int CreateCurrentRoll(int class_id,int finger_id){
+       HttpService httpsv=new HttpService();
+               System.out.printf("%d|%d\n",class_id,finger_id);
+
+       try {
+       String rsp=httpsv.CreateRoll(class_id,finger_id);
+       Gson gson = new GsonBuilder().create();
+       CreateClassRespone r=new CreateClassRespone();
+       r=gson.fromJson(rsp, CreateClassRespone.class);
+       return r.getRcode();
+
+        }
+        catch(Exception e){
+            System.err.println(e);
+        }
+            return 0;
+      }  
     void showdate(){
         Date d = new Date();
         SimpleDateFormat s = new SimpleDateFormat("dd-MM-yyyy");
@@ -251,7 +289,6 @@ public class Home extends javax.swing.JFrame {
         }).start();
     }
     void connectHardware(){
-        FingerHW fingerHW=new FingerHW();
         fingerHW.connect();
 
         try {
@@ -264,11 +301,40 @@ public class Home extends javax.swing.JFrame {
                 try {
                     nextLine = reader.readLine();
                     System.out.println(nextLine);
-                    System.out.println(i++);
                     Gson gson = new GsonBuilder().create(); 
                     FingerData fingerData = gson.fromJson(nextLine, FingerData.class);
                     System.out.println("parse:"+fingerData.toString());
-                } catch (Exception e) {}
+                    int c = 0;
+                    try {
+
+                        c = Integer.parseInt(fingerData.getData().toString());
+
+                    } catch(NumberFormatException e) {
+
+                        double d = Double.parseDouble(fingerData.getData().toString()); 
+
+                        c = (int) d;
+                    }
+                    
+                    if (fingerData.getType()==1) {
+                               System.out.printf("%d|%d",rootClasses.get(dashboard_combox_chooseclass.getSelectedIndex()).getId(), c);
+                    int rcode=CreateCurrentRoll(rootClasses.get(dashboard_combox_chooseclass.getSelectedIndex()).getId(),c);
+                    System.err.println(rcode);
+                    if(rcode==200){
+                        RenderCurrentRollByClassID(rootClasses.get(dashboard_combox_chooseclass.getSelectedIndex()).getId());
+                    }
+
+                    }
+                    
+                    if (fingerData.getType()==2) {
+                        scanFingerID=c;
+                        frame_scanfinger.setVisible(false);
+                        
+                    }
+
+                } catch (Exception e) {
+//                    System.out.println(e);
+                }
             }
         } 
         catch (Exception e) { e.printStackTrace(); }
@@ -1401,6 +1467,8 @@ public class Home extends javax.swing.JFrame {
         frame_scanfinger.pack();
         frame_scanfinger.setLocationRelativeTo(null);
         frame_scanfinger.setVisible(true);
+        Command regc=new Command(2);
+        fingerHW.sendCommand(regc);
     }//GEN-LAST:event_btn_scanActionPerformed
 
     private void btn_deletestudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deletestudentActionPerformed
@@ -1480,13 +1548,15 @@ public class Home extends javax.swing.JFrame {
             attendenceClass.setCode(txt_classcode.getText());
             attendenceClass.setSemester(Integer.parseInt(combobox_semester.getSelectedItem().toString()));
             attendenceClass.setYear(combobox_year.getSelectedItem().toString());
-            int rcode=CreateClass(attendenceClass);
-            System.out.println(rcode);
-            if (rcode==200) {
+            CreateClassRespone1 r=CreateClassRsp(attendenceClass);
+            System.out.println(r);
+            if (r.getRcode()==200) {
+                attendenceClass.setId(r.getData().getClass_().getId());
                 rootClasses.add(attendenceClass);
                 model.addRow(row);
                 dashboard_combox_chooseclass.addItem(txt_classcode.getText() + " HK" + combobox_semester.getSelectedItem() + " " + combobox_year.getSelectedItem());
                 student_combobox_class.addItem(txt_classcode.getText() + " HK" + combobox_semester.getSelectedItem() + " " + combobox_year.getSelectedItem());
+                statistic_class_combobox.addItem(txt_classcode.getText() + " HK" + combobox_semester.getSelectedItem() + " " + combobox_year.getSelectedItem());
             }
 }
         }
@@ -1672,9 +1742,20 @@ public class Home extends javax.swing.JFrame {
                 }
             }
             if(check){
+            HttpService httpsv=new HttpService();
+            try {
+            CreateClassRespone rsp=httpsv.CreateStudent(txt_namestudent.getText(),Integer.parseInt(txt_mssv.getText().toString()),rootClasses.get(student_combobox_class.getSelectedIndex()).getId(),scanFingerID,scanFingerID!=-1?true:false);
+                if (rsp.getRcode()==200) {
+                scanFingerID=-1;
                 student student = new student(txt_namestudent.getText(),txt_mssv.getText());
                 model.addRow(new Object[]{txt_namestudent.getText(),txt_mssv.getText(),"none"});
-            }
+  
+                }
+
+        }
+        catch(Exception e){
+            System.err.println(e);
+        }          }
         }
         
             
@@ -1871,7 +1952,10 @@ public class Home extends javax.swing.JFrame {
 
     private void student_combobox_classActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_student_combobox_classActionPerformed
         // TODO add your handling code here:
-        if(student_combobox_class.getSelectedIndex()>=0)
+//        if(student_combobox_class.getSelectedIndex()>=0)
+        System.out.println(rootClasses.size());
+        System.out.println(student_combobox_class.getSelectedIndex());
+        System.out.println(rootClasses.get(student_combobox_class.getSelectedIndex()).getId());
             RenderStudentByClassID(rootClasses.get(student_combobox_class.getSelectedIndex()).getId());
     }//GEN-LAST:event_student_combobox_classActionPerformed
 

@@ -3,9 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/github/SE330-fingerprint-scanner/src/Login.java</file>
-            <file>file:/E:/github/SE330-fingerprint-scanner/src/Class.java</file>
-            <file>file:/E:/github/SE330-fingerprint-scanner/src/Home.java</file>
+            <file>file:/Users/tuyen/Project/AttendenceSystem/src/hardware/FingerData.java</file>
+            <file>file:/Users/tuyen/Project/AttendenceSystem/src/hardware/FingerHW.java</file>
+            <file>file:/Users/tuyen/Project/AttendenceSystem/src/hardware/Command.java</file>
+            <file>file:/Users/tuyen/Project/AttendenceSystem/src/Class.java</file>
+            <file>file:/Users/tuyen/Project/AttendenceSystem/src/Login.java</file>
+            <file>file:/Users/tuyen/Project/AttendenceSystem/src/httpserivce/HttpService.java</file>
+            <file>file:/Users/tuyen/Project/AttendenceSystem/src/Home.java</file>
+            <file>file:/Users/tuyen/Project/AttendenceSystem/src/Signup_final.java</file>
         </group>
     </open-files>
 </project-private>
