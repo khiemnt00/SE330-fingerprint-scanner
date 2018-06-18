@@ -29,7 +29,7 @@ Attendence System là phần mềm điểm danh chạy trên nền java sử d�
 
 ## Screenshoot
 
-![alt tag](loginscreen.png "Sơ đồ giao diện tổng thể")
+![alt tag](Loginscreen.png "Sơ đồ giao diện tổng thể")
 
 ![alt tag](rollscreen.png "Sơ đồ giao diện tổng thể")
 
